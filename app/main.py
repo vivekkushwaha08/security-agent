@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from app import config_store
 
 app = FastAPI(title="Security Agent", version="0.1.0")
@@ -25,6 +25,7 @@ class PromptPayload(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/config", response_class=HTMLResponse)
 async def home():
     return (BASE / "templates" / "config.html").read_text(encoding="utf-8")
 
