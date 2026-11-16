@@ -2,14 +2,20 @@
   "app": {"name": "Security Agent", "environment": "development", "log_level": "INFO"},
   "webhook": {"enabled": true, "provider": "bitbucket", "secret_env": "BITBUCKET_WEBHOOK_SECRET", "allowed_repositories": [], "require_signature": true},
   "git": {"workspace_root": "./workspaces", "allowed_hosts": ["bitbucket.org"], "fetch_depth": 1, "checkout_timeout_seconds": 120},
-  "ai": {"enabled": false, "provider": "claude", "model": "claude-sonnet-4-5", "timeout_seconds": 180, "max_input_chars": 120000, "api_key_env": "ANTHROPIC_API_KEY", "cli_command": "claude"},
-  "scanners": {
-    "semgrep": {"enabled": true, "command": "semgrep", "args": ["scan", "--config", "auto", "--json"]},
-    "osv": {"enabled": true, "command": "osv-scanner", "args": ["scan", "source", "--format", "json"]},
-    "trivy": {"enabled": true, "command": "trivy", "args": ["fs", "--format", "json"]},
-    "gitleaks": {"enabled": true, "command": "gitleaks", "args": ["dir", "--report-format", "json"]}
+  "ai": {"enabled": true, "provider": "claude", "model": "claude-sonnet", "timeout_seconds": 300, "max_input_chars": 120000, "api_key_env": "ANTHROPIC_API_KEY", "cli_command": "claude"},
+  "live_intelligence": {
+    "require_online_validation": true,
+    "max_evidence_age_days": 30,
+    "request_timeout_seconds": 20,
+    "sources": {
+      "osv": {"enabled": true, "base_url": "https://api.osv.dev/v1"},
+      "nvd": {"enabled": true, "base_url": "https://services.nvd.nist.gov/rest/json/cves/2.0", "api_key_env": "NVD_API_KEY"},
+      "github_advisories": {"enabled": true, "base_url": "https://api.github.com/advisories", "token_env": "GITHUB_TOKEN"},
+      "cisa_kev": {"enabled": true, "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"},
+      "endoflife": {"enabled": true, "base_url": "https://endoflife.date/api"}
+    }
   },
-  "analysis": {"check_cwe": true, "check_eol": true, "fail_on": "high", "max_repository_mb": 500},
-  "workers": {"backend": "local", "redis_url_env": "REDIS_URL", "max_concurrency": 2, "job_timeout_seconds": 900},
+  "analysis": {"check_cwe": true, "check_eol": true, "require_source_citations": true, "fail_on": "high", "max_repository_mb": 500},
+  "workers": {"backend": "local", "redis_url_env": "REDIS_URL", "max_concurrency": 2, "job_timeout_seconds": 1200},
   "reporting": {"formats": ["json", "sarif"], "output_dir": "./reports", "retain_days": 30}
 }
