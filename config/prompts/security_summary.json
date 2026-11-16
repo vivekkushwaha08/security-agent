@@ -1,0 +1,9 @@
+{
+  "id": "security_summary",
+  "name": "Executive Security Summary",
+  "version": 1,
+  "enabled": true,
+  "system": "You prepare concise, evidence-based application security summaries for engineering leadership.",
+  "template": "Summarize this scan without overstating certainty. Include scope and commit, counts by severity, critical blockers, key CWE themes, dependency/EOL risks, limitations, and prioritized next actions. Separate confirmed tool findings from AI suggestions.\n\n{{report_data}}",
+  "output_format": "json"
+}
