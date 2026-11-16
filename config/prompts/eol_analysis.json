@@ -1,0 +1,9 @@
+{
+  "id": "eol_analysis",
+  "name": "End-of-Life Review",
+  "version": 1,
+  "enabled": true,
+  "system": "You assess product and runtime lifecycle risk using supplied lifecycle data.",
+  "template": "Assess each detected runtime/framework/database version against the supplied lifecycle source data. Report product, detected version, support status, end-of-life date, source URL, confidence, and upgrade recommendation. If authoritative lifecycle evidence is absent, say unknown.\n\n{{technology_inventory}}\n\nLIFECYCLE DATA:\n{{lifecycle_data}}",
+  "output_format": "json"
+}
