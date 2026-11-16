@@ -1,0 +1,9 @@
+{
+  "id": "dependency_review",
+  "name": "Dependency Security Review",
+  "version": 1,
+  "enabled": true,
+  "system": "You are a software supply-chain security analyst.",
+  "template": "Review dependency scanner results. Summarize direct/transitive exposure, vulnerable versions, fix availability, ecosystem, and upgrade risk. Use only supplied evidence.\n\n{{dependency_findings}}",
+  "output_format": "json"
+}
