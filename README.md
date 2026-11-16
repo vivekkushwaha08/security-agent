@@ -1,16 +1,23 @@
 # Security Agent
 
-A configurable Python security-review service for Bitbucket repositories. It combines deterministic security scanners with optional AI-assisted triage. Scanner output remains the source of truth; AI findings are advisory and must be verified.
+A Python security investigation agent for Bitbucket repositories. It inspects an exact Git commit, prepares an investigation task for an AI CLI (Claude, Gemini or Copilot), and validates candidate vulnerabilities against **live online security sources**.
+
+## Design principles
+
+- No mandatory local SAST/SCA/secrets-scanner binaries or offline vulnerability database.
+- Live lookups against OSV.dev, NVD, GitHub Security Advisories, CISA KEV, vendor advisories and lifecycle sources.
+- AI CLI findings require direct online evidence, URLs and source dates. Model memory alone is not proof.
+- A failed or unavailable online lookup produces `UNVERIFIED`, never a false "clean" result.
+- The target commit is pinned by SHA. Repository content is untrusted and is never executed.
 
 ## Features
 
 - FastAPI configuration console and JSON-backed settings.
 - Editable, versioned prompt templates stored as JSON.
-- Bitbucket webhook endpoint with HMAC-SHA256 verification and commit-SHA pinning.
-- Background job interface (initial local queue; Redis/Celery adapter can be enabled).
-- Isolated Git checkout, scanner adapters (Semgrep, OSV-Scanner, Trivy, Gitleaks).
-- JSON and SARIF-ready report model.
-- Docker deployment.
+- Bitbucket webhook signature validation and commit-SHA extraction.
+- Live online intelligence adapters in `app/intelligence_sources.py`.
+- Provider-neutral CLI investigation task builder in `app/cli_task.py`.
+- JSON/SARIF-ready reporting foundation and Docker deployment.
 
 ## Quick start
 
@@ -22,33 +29,25 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Open http://localhost:8000/config. Configuration is persisted under `config/security_agent.json`; prompt templates are under `config/prompts/*.json`.
+Open http://localhost:8000/config. Settings are stored in `config/security_agent.json`; editable prompts are under `config/prompts/*.json`.
 
-## Important security notes
+## Online intelligence sources
 
-- This repository is public. Do not commit API keys, Bitbucket secrets, access tokens, or private repository URLs.
-- Keep secrets in environment variables or a secret manager. The UI stores secret *environment-variable names*, not secret values.
-- Run repository analysis in disposable, unprivileged containers with restricted network egress and resource limits.
-- Webhook payloads are untrusted. Validate signatures, allow-list workspace/repository URLs, pin the event commit SHA, and never execute repository code.
-- AI analysis is not a substitute for SAST/SCA/secrets scanning and cannot guarantee complete CWE coverage.
+- OSV.dev API: package, ecosystem and exact-version queries.
+- NVD CVE API 2.0: CVE metadata, affected ranges and CWE/CVSS details.
+- GitHub Security Advisories API: package advisory lookups.
+- CISA KEV: known-exploited vulnerability status.
+- Vendor security advisories: authoritative affected/fixed version confirmation.
+- endoflife.date and vendor lifecycle pages: product support/EOL checks.
 
-## Configuration
+Set `NVD_API_KEY` and `GITHUB_TOKEN` in the worker environment where applicable. Never store credentials in JSON or commit them.
 
-The configuration UI edits safe operational settings in JSON. Environment variable references are used for secrets (for example, `BITBUCKET_WEBHOOK_SECRET`, `ANTHROPIC_API_KEY`). Prompt JSON can be edited independently and is loaded when a job starts.
+## AI CLI web search
 
-## Scanner prerequisites
+Installing Claude, Gemini or Copilot CLI does not automatically guarantee web search. The selected CLI adapter must verify that live web search/tools are enabled for the actual CLI session. The generated task explicitly requires current web research and citations. If the CLI cannot search, the agent must rely only on separately retrieved online evidence or mark the result UNVERIFIED.
 
-Install the tools you enable and make their binaries available on PATH:
+## Security
 
-- Semgrep: `semgrep`
-- OSV-Scanner: `osv-scanner`
-- Trivy: `trivy`
-- Gitleaks: `gitleaks`
+This repository is public. Never commit credentials. Keep the configuration UI restricted to localhost or a trusted admin network until authentication/RBAC is implemented. Run analysis in isolated workers with network egress allow-lists. Never execute repository scripts, build hooks, package lifecycle scripts or arbitrary commands from webhook/repository content.
 
-## Development
-
-```bash
-pytest
-```
-
-See [docs/architecture.md](docs/architecture.md) for the processing flow and deployment guidance.
+See [docs/architecture.md](docs/architecture.md) and [docs/configuration.md](docs/configuration.md).
