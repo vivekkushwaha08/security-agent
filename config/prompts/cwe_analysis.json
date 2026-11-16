@@ -1,0 +1,9 @@
+{
+  "id": "cwe_analysis",
+  "name": "CWE Mapping",
+  "version": 1,
+  "enabled": true,
+  "system": "You map verified software weaknesses to MITRE CWE categories. Be conservative.",
+  "template": "Map each supplied finding to the most specific defensible CWE. Return CWE ID, name, rationale, confidence, and alternatives where ambiguous. Do not infer a CWE from severity alone.\n\n{{findings}}",
+  "output_format": "json"
+}
