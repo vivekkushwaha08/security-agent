@@ -11,7 +11,7 @@
     <div class="brand"><span class="brand-mark">S</span><div><b>Security Agent</b><small>CONTROL CENTER</small></div></div>
     <nav>
       <button class="nav active" data-tab="general">⚙ Configuration</button>
-      <button class="nav" data-tab="scanners">⌕ Security scanners</button>
+      <button class="nav" data-tab="sources">⌕ Live intelligence</button>
       <button class="nav" data-tab="ai">✦ AI provider</button>
       <button class="nav" data-tab="prompts">▤ Prompt library</button>
       <button class="nav" data-tab="webhook">⇄ Webhook & Git</button>
@@ -19,7 +19,7 @@
     <div class="side-foot"><span class="dot"></span> Local configuration store</div>
   </aside>
   <main>
-    <header><div><small>ADMINISTRATION / SETTINGS</small><h1>Configuration</h1><p>Manage scan behavior, integrations and reusable AI instructions.</p></div><div class="header-actions"><span class="status">● JSON storage</span><button class="primary" id="saveConfig">Save configuration</button></div></header>
+    <header><div><small>ADMINISTRATION / SETTINGS</small><h1>Configuration</h1><p>Manage live security research, integrations and reusable AI instructions.</p></div><div class="header-actions"><span class="status">● JSON storage</span><button class="primary" id="saveConfig">Save configuration</button></div></header>
     <div id="notice" role="status"></div>
     <section class="panel tab-panel" id="general">
       <div class="section-head"><div><h2>General settings</h2><p>Runtime defaults and analysis policy.</p></div></div>
@@ -36,12 +36,12 @@
         <label><span><b>End-of-life checks</b><small>Flag unsupported runtimes and frameworks when lifecycle evidence is available.</small></span><input type="checkbox" data-path="analysis.check_eol"></label>
       </div>
     </section>
-    <section class="panel tab-panel hidden" id="scanners">
-      <div class="section-head"><div><h2>Security scanners</h2><p>Enable deterministic scanners; configure executable names and arguments.</p></div></div>
-      <div id="scannerCards" class="scanner-grid"></div>
+    <section class="panel tab-panel hidden" id="sources">
+      <div class="section-head"><div><h2>Live intelligence sources</h2><p>Use current online advisories and lifecycle sources. No local scanner binaries or offline vulnerability databases are required.</p></div></div>
+      <div id="sourceCards" class="scanner-grid"></div>
     </section>
     <section class="panel tab-panel hidden" id="ai">
-      <div class="section-head"><div><h2>AI provider</h2><p>AI assists with triage and explanation. Scanner evidence remains authoritative.</p></div></div>
+      <div class="section-head"><div><h2>AI provider</h2><p>AI CLI investigates code and must validate claims using live online evidence.</p></div></div>
       <div class="form-grid">
         <label class="checkline"><input type="checkbox" data-path="ai.enabled"> Enable AI analysis</label>
         <label>Provider<select data-path="ai.provider"><option value="claude">Claude CLI</option><option value="gemini">Gemini CLI</option><option value="copilot">GitHub Copilot CLI</option></select></label>
@@ -51,7 +51,7 @@
         <label>Execution timeout (seconds)<input type="number" data-path="ai.timeout_seconds"></label>
         <label>Maximum prompt input characters<input type="number" data-path="ai.max_input_chars"></label>
       </div>
-      <p class="hint">Secret values are never stored in this JSON file. Configure the named environment variable on the worker host.</p>
+      <p class="hint">The selected CLI must have web search enabled. API credentials remain in environment variables. If live research is unavailable, findings must be marked UNVERIFIED.</p>
     </section>
     <section class="panel tab-panel hidden" id="webhook">
       <div class="section-head"><div><h2>Webhook & repository access</h2><p>Validate Bitbucket events and restrict clone destinations.</p></div></div>
