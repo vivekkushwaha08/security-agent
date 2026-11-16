@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security Agent · Configuration</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">S</span><div><b>Security Agent</b><small>CONTROL CENTER</small></div></div>
+    <nav>
+      <button class="nav active" data-tab="general">⚙ Configuration</button>
+      <button class="nav" data-tab="scanners">⌕ Security scanners</button>
+      <button class="nav" data-tab="ai">✦ AI provider</button>
+      <button class="nav" data-tab="prompts">▤ Prompt library</button>
+      <button class="nav" data-tab="webhook">⇄ Webhook & Git</button>
+    </nav>
+    <div class="side-foot"><span class="dot"></span> Local configuration store</div>
+  </aside>
+  <main>
+    <header><div><small>ADMINISTRATION / SETTINGS</small><h1>Configuration</h1><p>Manage scan behavior, integrations and reusable AI instructions.</p></div><div class="header-actions"><span class="status">● JSON storage</span><button class="primary" id="saveConfig">Save configuration</button></div></header>
+    <div id="notice" role="status"></div>
+    <section class="panel tab-panel" id="general">
+      <div class="section-head"><div><h2>General settings</h2><p>Runtime defaults and analysis policy.</p></div></div>
+      <div class="form-grid">
+        <label>Application name<input data-path="app.name"></label>
+        <label>Environment<select data-path="app.environment"><option>development</option><option>staging</option><option>production</option></select></label>
+        <label>Log level<select data-path="app.log_level"><option>DEBUG</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select></label>
+        <label>Fail build on<select data-path="analysis.fail_on"><option>critical</option><option>high</option><option>medium</option><option>low</option></select></label>
+        <label>Maximum repository size (MB)<input type="number" data-path="analysis.max_repository_mb"></label>
+        <label>Maximum concurrent jobs<input type="number" data-path="workers.max_concurrency"></label>
+      </div>
+      <div class="toggle-list">
+        <label><span><b>CWE classification</b><small>Map verified findings to applicable CWE categories.</small></span><input type="checkbox" data-path="analysis.check_cwe"></label>
+        <label><span><b>End-of-life checks</b><small>Flag unsupported runtimes and frameworks when lifecycle evidence is available.</small></span><input type="checkbox" data-path="analysis.check_eol"></label>
+      </div>
+    </section>
+    <section class="panel tab-panel hidden" id="scanners">
+      <div class="section-head"><div><h2>Security scanners</h2><p>Enable deterministic scanners; configure executable names and arguments.</p></div></div>
+      <div id="scannerCards" class="scanner-grid"></div>
+    </section>
+    <section class="panel tab-panel hidden" id="ai">
+      <div class="section-head"><div><h2>AI provider</h2><p>AI assists with triage and explanation. Scanner evidence remains authoritative.</p></div></div>
+      <div class="form-grid">
+        <label class="checkline"><input type="checkbox" data-path="ai.enabled"> Enable AI analysis</label>
+        <label>Provider<select data-path="ai.provider"><option value="claude">Claude CLI</option><option value="gemini">Gemini CLI</option><option value="copilot">GitHub Copilot CLI</option></select></label>
+        <label>Model<input data-path="ai.model" placeholder="Provider model identifier"></label>
+        <label>CLI command<input data-path="ai.cli_command" placeholder="claude"></label>
+        <label>API key environment variable<input data-path="ai.api_key_env" placeholder="ANTHROPIC_API_KEY"></label>
+        <label>Execution timeout (seconds)<input type="number" data-path="ai.timeout_seconds"></label>
+        <label>Maximum prompt input characters<input type="number" data-path="ai.max_input_chars"></label>
+      </div>
+      <p class="hint">Secret values are never stored in this JSON file. Configure the named environment variable on the worker host.</p>
+    </section>
+    <section class="panel tab-panel hidden" id="webhook">
+      <div class="section-head"><div><h2>Webhook & repository access</h2><p>Validate Bitbucket events and restrict clone destinations.</p></div></div>
+      <div class="form-grid">
+        <label class="checkline"><input type="checkbox" data-path="webhook.enabled"> Enable Bitbucket webhook</label>
+        <label class="checkline"><input type="checkbox" data-path="webhook.require_signature"> Require HMAC signature</label>
+        <label>Webhook secret environment variable<input data-path="webhook.secret_env"></label>
+        <label>Allowed Git hosts (comma separated)<input id="allowedHosts"></label>
+        <label>Checkout timeout (seconds)<input type="number" data-path="git.checkout_timeout_seconds"></label>
+        <label>Git fetch depth<input type="number" data-path="git.fetch_depth"></label>
+        <label>Workspace directory<input data-path="git.workspace_root"></label>
+      </div>
+      <label>Allowed repository slugs (one per line)<textarea id="allowedRepos" rows="4"></textarea></label>
+    </section>
+    <section class="panel tab-panel hidden" id="prompts">
+      <div class="section-head"><div><h2>Prompt library</h2><p>Edit the JSON prompt templates used by analysis jobs. Each save increments its version.</p></div></div>
+      <div class="prompt-layout">
+        <div><label>Prompt template<select id="promptSelect"></select></label><div class="prompt-meta" id="promptMeta">Select a prompt to edit.</div></div>
+        <div class="prompt-editor"><label>System instruction<textarea id="promptSystem" rows="4"></textarea></label><label>Prompt template<textarea id="promptTemplate" rows="15" spellcheck="false"></textarea></label><div class="editor-actions"><button class="secondary" id="reloadPrompt">Discard changes</button><button class="primary" id="savePrompt">Save prompt version</button></div></div>
+      </div>
+      <p class="hint">Prompt variables are substituted by the worker (for example {{'{{commit_sha}}'}}, {{'{{scanner_findings}}'}}). Treat source code, diffs and scanner output as untrusted data.</p>
+    </section>
+    <footer>Security Agent <span>Configuration is loaded by the service at runtime. Restart workers after operational setting changes.</span></footer>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body></html>
